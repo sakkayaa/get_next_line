@@ -1,57 +1,58 @@
-# get_next_line
+# 📄 get_next_line
 
-> **C ile dosyalardan satır satır okuma**
-> Dosya tanımlayıcısından bir satır okuyan ve her çağrıda sonraki satırı döndüren bir C projesi.
+> **A line-by-line reader for file descriptors, written in C as part of the 42 School curriculum.**
 
-## Proje hakkında
+## 🎯 About the project
 
-`get_next_line`, açık bir dosya tanımlayıcısından (`fd`) veriyi okur ve her çağrıda bir sonraki satırı dinamik olarak ayrılmış bir string olarak döndürür. Satır sonu (`\n`) varsa dönen satıra dahildir. Dosyanın sonuna gelindiğinde veya okuma başarısız olduğunda fonksiyon `NULL` döndürür.
+`get_next_line` reads from an open file descriptor and returns one line per function call. The returned line includes its trailing newline when one is present. The function returns `NULL` when there is no more input or when a read error occurs.
 
-Proje; `read`, statik değişkenler, dinamik bellek yönetimi, buffer kullanımı ve dosya tanımlayıcılarıyla çalışma konularını kapsar. Harici kütüphane bağımlılığı yoktur.
+The project focuses on low-level file I/O, configurable buffers, static storage, and careful dynamic memory management.
 
-## Öne çıkanlar
+## ✨ Features
 
-- **Satır satır okuma:** her çağrıda bir satır döndürür
-- **Ayarlanabilir buffer:** `BUFFER_SIZE` derleme sırasında belirlenebilir
-- **Dinamik bellek:** satırlar ve kalan veri için bellek yönetimi
-- **Bonus sürüm:** birden fazla dosya tanımlayıcısı için ayrı okuma durumu
-- **C ve POSIX dosya işlemleri:** `read`, `open` ve `close`
+- 📥 Read input one line at a time with `read()`
+- ⚙️ Configure the read buffer at compile time with `BUFFER_SIZE`
+- 🧠 Preserve unread bytes between calls
+- 📂 Bonus implementation keeps independent state for multiple file descriptors
+- 🧩 Separate utility functions and headers for the mandatory and bonus versions
 
-## Dosyalar
+## 📁 Project files
 
-| Dosya | Amaç |
+| File | Purpose |
 |---|---|
-| `get_next_line.c` | Temel sürümün satır okuma fonksiyonu |
-| `get_next_line_utils.c` | Temel sürümün string ve satır yardımcıları |
-| `get_next_line.h` | Temel sürümün tanımları ve bildirimleri |
-| `get_next_line_bonus.c` | Birden fazla dosya tanımlayıcısını destekleyen bonus sürüm |
-| `get_next_line_utils_bonus.c` | Bonus sürümün yardımcı fonksiyonları |
-| `get_next_line_bonus.h` | Bonus sürümün tanımları ve bildirimleri |
+| `get_next_line.c` | Mandatory line-reading implementation |
+| `get_next_line_utils.c` | Helpers for the mandatory implementation |
+| `get_next_line.h` | Mandatory declarations and definitions |
+| `get_next_line_bonus.c` | Multiple-file-descriptor implementation |
+| `get_next_line_utils_bonus.c` | Helpers for the bonus implementation |
+| `get_next_line_bonus.h` | Bonus declarations and definitions |
 
-## Gereksinimler
+## 🛠️ Requirements
 
-- C derleyicisi (`cc`, `gcc` veya uyumlu bir derleyici)
-- POSIX uyumlu işletim sistemi
+- A C compiler such as `cc` or `gcc`
+- A POSIX-compatible system
 
-## Derleme ve kullanım
+This project does not include a Makefile; compile the source files directly.
 
-Projede Makefile bulunmadığından kaynak dosyalarını derleyiciye doğrudan verin. Aşağıdaki örnekte `main.c`, `get_next_line` fonksiyonunu kullanan programınızdır.
+## 🚀 Compile
 
-Temel sürüm:
+Use your own `main.c` that calls `get_next_line`.
+
+**Mandatory version:**
 
 ```bash
 cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 \
   main.c get_next_line.c get_next_line_utils.c -o gnl
 ```
 
-Bonus sürüm:
+**Bonus version:**
 
 ```bash
 cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 \
   main.c get_next_line_bonus.c get_next_line_utils_bonus.c -o gnl
 ```
 
-Örnek kullanım:
+## 💡 Example
 
 ```c
 #include "get_next_line.h"
@@ -62,9 +63,10 @@ cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 \
 
 int main(void)
 {
-    int fd = open("input.txt", O_RDONLY);
-    char *line;
+    int     fd;
+    char    *line;
 
+    fd = open("input.txt", O_RDONLY);
     if (fd < 0)
         return (1);
     while ((line = get_next_line(fd)) != NULL)
@@ -77,17 +79,26 @@ int main(void)
 }
 ```
 
-`BUFFER_SIZE` değeri her `read` çağrısında okunacak bayt sayısını belirler. Farklı değerlerle derleyerek buffer boyutunun okuma davranışına etkisini inceleyebilirsiniz.
+Change `BUFFER_SIZE` at compile time to explore how the chunk size affects reading. Free each returned line when you are finished with it.
 
-## Öğrenme çıktıları
+## 🧠 Skills practiced
 
-Bu çalışma; dosya I/O, buffer yönetimi, statik değişkenler, dinamik bellek ayırma ve birden fazla dosya tanımlayıcısı için durum tutma becerilerini gösterir.
+- File descriptors and POSIX `read()`
+- Buffer management and static storage
+- Dynamic memory allocation and cleanup
+- Supporting independent state for multiple open files
 
-## Geliştiren
+## 🏅 42 evaluation
 
-**Sedef Akkaya**
-GitHub: [sakkayaa](https://github.com/sakkayaa) · LinkedIn: [Sedef Akkaya](https://www.linkedin.com/in/sedef-akkaya-0a5580228/)
+The project received a **successful score of 125/100**. The evaluation summary is included below.
+
+![42 get_next_line evaluation result: successful, 125 out of 100](assets/get_next_line-evaluation.png)
+
+## 👩‍💻 Author
+
+**Sedef Akkaya**  
+[GitHub](https://github.com/sakkayaa) · [LinkedIn](https://www.linkedin.com/in/sedef-akkaya-0a5580228/)
 
 ---
 
-*Her çağrıda bir satır. Dosyanın sonuna kadar.*
+✨ *One call, one line, until the input is complete.*
