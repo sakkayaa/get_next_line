@@ -1,59 +1,93 @@
 # get_next_line
 
+> **C ile dosyalardan satır satır okuma**
+> Dosya tanımlayıcısından bir satır okuyan ve her çağrıda sonraki satırı döndüren bir C projesi.
 
-AMAÇ
+## Proje hakkında
 
+`get_next_line`, açık bir dosya tanımlayıcısından (`fd`) veriyi okur ve her çağrıda bir sonraki satırı dinamik olarak ayrılmış bir string olarak döndürür. Satır sonu (`\n`) varsa dönen satıra dahildir. Dosyanın sonuna gelindiğinde veya okuma başarısız olduğunda fonksiyon `NULL` döndürür.
 
-Dosyanın içindekileri, satır sartır argüman olarak başka bir dosyaya yazdırmak.
+Proje; `read`, statik değişkenler, dinamik bellek yönetimi, buffer kullanımı ve dosya tanımlayıcılarıyla çalışma konularını kapsar. Harici kütüphane bağımlılığı yoktur.
 
-******
-static char                 --> bu değeri alan değişken, fonksiyon a değeri ile bitip tekrar başladığı zaman; ilk değerinden değil,
-                            2. değerinden yani a değerinden devam eder.
+## Öne çıkanlar
 
+- **Satır satır okuma:** her çağrıda bir satır döndürür
+- **Ayarlanabilir buffer:** `BUFFER_SIZE` derleme sırasında belirlenebilir
+- **Dinamik bellek:** satırlar ve kalan veri için bellek yönetimi
+- **Bonus sürüm:** birden fazla dosya tanımlayıcısı için ayrı okuma durumu
+- **C ve POSIX dosya işlemleri:** `read`, `open` ve `close`
 
-BUFFER_SIZE                 --> Satırları kaçarlı kaçarlı okuyacağını belirliyorsun.
+## Dosyalar
 
+| Dosya | Amaç |
+|---|---|
+| `get_next_line.c` | Temel sürümün satır okuma fonksiyonu |
+| `get_next_line_utils.c` | Temel sürümün string ve satır yardımcıları |
+| `get_next_line.h` | Temel sürümün tanımları ve bildirimleri |
+| `get_next_line_bonus.c` | Birden fazla dosya tanımlayıcısını destekleyen bonus sürüm |
+| `get_next_line_utils_bonus.c` | Bonus sürümün yardımcı fonksiyonları |
+| `get_next_line_bonus.h` | Bonus sürümün tanımları ve bildirimleri |
 
-read(fd, buff, BUFFER_SIZE) --> read; fd'nin içindeki BUFFER_SIZZE kadar karakteri, buff'a okur.
-read, aslında her defasında fd'yi en baştan okumaya başlar. Ama mesela ilk BUFFER_SIZE kadar okuduğu yeri,
-bir sonraki okuyuşunda saymaz. Sonrakinde, bir sonraki BUFFER_SIZE'ı alır.
+## Gereksinimler
 
+- C derleyicisi (`cc`, `gcc` veya uyumlu bir derleyici)
+- POSIX uyumlu işletim sistemi
 
-Bilgi: 
-~~~
-fd --> file description 
-* fd < 0 ise dosya okunmadığı anlamına geliyor.
-* fd = 0 ise standart giriş -> kalvye girişi.
-* fd = 0 ise standart çıktı -> metni yazdırdığı anlamına geliyor.
-* fd = 2 ise standart hata  -> hata çıkma durumu.
-~~~
+## Derleme ve kullanım
 
-*****************
-INT MAIN
+Projede Makefile bulunmadığından kaynak dosyalarını derleyiciye doğrudan verin. Aşağıdaki örnekte `main.c`, `get_next_line` fonksiyonunu kullanan programınızdır.
 
-open("txt", O_RDONLY) --> txt dosyasını açıp O_RDONLY komutu ile okur.
-                          open int değer döndürür. Yani file descriptionlardan bir değer döndürür.
+Temel sürüm:
 
-~~~~~~~~~~~~~~~~~~~~~~
-O_RDONLY --> read only
+```bash
+cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 \
+  main.c get_next_line.c get_next_line_utils.c -o gnl
+```
 
-O_WRONLY --> write only
+Bonus sürüm:
 
-O_RDWR   --> read and write
-~~~~~~~~~~~~~~~~~~~~~~
+```bash
+cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 \
+  main.c get_next_line_bonus.c get_next_line_utils_bonus.c -o gnl
+```
 
-Bunları kütüphanede makrolar olarak ekliyebilirsin:
-~~~
-#define O_READONLY  00
+Örnek kullanım:
 
-#define O_WRONLY    01
+```c
+#include "get_next_line.h"
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#define O_RDWR      02
-~~~
+int main(void)
+{
+    int fd = open("input.txt", O_RDONLY);
+    char *line;
 
+    if (fd < 0)
+        return (1);
+    while ((line = get_next_line(fd)) != NULL)
+    {
+        printf("%s", line);
+        free(line);
+    }
+    close(fd);
+    return (0);
+}
+```
 
-***
-Olayı da açıklamak isterdim fakat 42 mantığına aykırı.
+`BUFFER_SIZE` değeri her `read` çağrısında okunacak bayt sayısını belirler. Farklı değerlerle derleyerek buffer boyutunun okuma davranışına etkisini inceleyebilirsiniz.
 
-Arkadaşlarınıza sorabilirsiniz ^^
-***
+## Öğrenme çıktıları
+
+Bu çalışma; dosya I/O, buffer yönetimi, statik değişkenler, dinamik bellek ayırma ve birden fazla dosya tanımlayıcısı için durum tutma becerilerini gösterir.
+
+## Geliştiren
+
+**Sedef Akkaya**
+GitHub: [sakkayaa](https://github.com/sakkayaa) · LinkedIn: [Sedef Akkaya](https://www.linkedin.com/in/sedef-akkaya-0a5580228/)
+
+---
+
+*Her çağrıda bir satır. Dosyanın sonuna kadar.*
